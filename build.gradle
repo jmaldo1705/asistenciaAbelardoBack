@@ -30,3 +30,13 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+// Asegurar que el JAR sea ejecutable y tenga un nombre consistente
+tasks.named('bootJar') {
+    archiveFileName = 'asistencia-backend.jar'
+}
+
+// Configuración adicional para Railway
+tasks.register('stage') {
+    dependsOn 'bootJar'
+}

@@ -1,0 +1,16 @@
+[build]
+builder = "NIXPACKS"
+
+[build.nixpacksPlan]
+providers = ["java"]
+
+[build.nixpacksPhases.setup]
+nixPkgs = ["...", "gradle"]
+
+[build.nixpacksPhases.build]
+cmds = ["./gradlew clean bootJar --no-daemon"]
+
+[deploy]
+startCommand = "java -Dserver.port=$PORT $JAVA_OPTS -jar build/libs/asistencia-backend.jar"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10

@@ -1,0 +1,17 @@
+# Ignorar archivos innecesarios en Railway
+.gradle
+build/
+!build/libs/
+.idea
+*.iml
+*.iws
+*.ipr
+out/
+.vscode/
+.DS_Store
+*.log
+.env
+.env.local
+
+# Ignorar archivos de test
+src/test/
