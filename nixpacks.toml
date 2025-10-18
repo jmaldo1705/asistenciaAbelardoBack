@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["openjdk21", "gradle_8"]
+
+[phases.install]
+cmds = ["echo 'Java version:' && java -version && echo 'Gradle version:' && gradle -version"]
+
+[phases.build]
+cmds = ["chmod +x ./gradlew", "./gradlew clean bootJar --no-daemon -x test --info"]
+
+[start]
+cmd = "java -Dserver.port=$PORT -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -jar build/libs/asistencia-backend.jar"

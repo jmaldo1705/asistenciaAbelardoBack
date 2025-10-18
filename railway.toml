@@ -5,10 +5,13 @@ builder = "NIXPACKS"
 providers = ["java"]
 
 [build.nixpacksPhases.setup]
-nixPkgs = ["...", "gradle"]
+nixPkgs = ["openjdk21", "gradle_8"]
+
+[build.nixpacksPhases.install]
+cmds = ["echo 'Java version:' && java -version"]
 
 [build.nixpacksPhases.build]
-cmds = ["./gradlew clean bootJar --no-daemon"]
+cmds = ["chmod +x ./gradlew", "./gradlew clean bootJar --no-daemon -x test"]
 
 [deploy]
 startCommand = "java -Dserver.port=$PORT $JAVA_OPTS -jar build/libs/asistencia-backend.jar"
