@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +44,8 @@ public class CoordinadorService {
             .orElseThrow(() -> new RuntimeException("Coordinador no encontrado"));
         
         coordinador.setConfirmado(true);
-        coordinador.setFechaLlamada(LocalDateTime.now());
+        // Usar la hora de Colombia (America/Bogota)
+        coordinador.setFechaLlamada(LocalDateTime.now(ZoneId.of("America/Bogota")));
         coordinador.setNumeroInvitados(numeroInvitados);
         coordinador.setObservaciones(observaciones);
         
