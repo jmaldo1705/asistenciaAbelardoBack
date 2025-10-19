@@ -61,6 +61,9 @@ public class CoordinadorService {
         coordinador.setNumeroInvitados(0);
         coordinador.setObservaciones(null);
         
+        // Eliminar todos los invitados
+        coordinador.getInvitados().clear();
+        
         return coordinadorRepository.save(coordinador);
     }
     
