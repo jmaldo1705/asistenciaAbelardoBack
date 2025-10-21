@@ -75,6 +75,18 @@ public class CoordinadorController {
         Coordinador coordinador = coordinadorService.desmarcarConfirmacion(id);
         return ResponseEntity.ok(coordinador);
     }
+
+    @PutMapping("/{id}/estado")
+    public ResponseEntity<Coordinador> actualizarEstado(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> datos) {
+
+        String estado = (String) datos.get("estado");
+        String observaciones = (String) datos.get("observaciones");
+
+        Coordinador coordinador = coordinadorService.actualizarEstado(id, estado, observaciones);
+        return ResponseEntity.ok(coordinador);
+    }
     
     @PostMapping("/{id}/invitados")
     public ResponseEntity<Coordinador> agregarInvitado(
@@ -89,23 +101,25 @@ public class CoordinadorController {
     public ResponseEntity<Coordinador> eliminarInvitado(
             @PathVariable Long coordinadorId,
             @PathVariable Long invitadoId) {
-        
+
         Coordinador coordinador = coordinadorService.eliminarInvitado(coordinadorId, invitadoId);
         return ResponseEntity.ok(coordinador);
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         coordinadorService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
-    
+
     @GetMapping("/estadisticas")
     public ResponseEntity<Map<String, Long>> obtenerEstadisticas() {
         Map<String, Long> estadisticas = Map.of(
             "total", coordinadorService.contarTotal(),
             "confirmados", coordinadorService.contarConfirmados(),
-            "pendientes", coordinadorService.contarTotal() - coordinadorService.contarConfirmados()
+            "pendientes", coordinadorService.contarPendientes(),
+            "noAsiste", coordinadorService.contarNoAsiste(),
+            "noContesta", coordinadorService.contarNoContesta()
         );
         return ResponseEntity.ok(estadisticas);
     }

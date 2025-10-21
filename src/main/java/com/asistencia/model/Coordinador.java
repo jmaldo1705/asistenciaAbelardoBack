@@ -39,6 +39,10 @@ public class Coordinador {
     @Column(length = 500)
     private String observaciones;
     
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private EstadoCoordinador estado;
+    
     @OneToMany(mappedBy = "coordinador", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Invitado> invitados = new ArrayList<>();
     
@@ -46,6 +50,7 @@ public class Coordinador {
     public Coordinador() {
         this.confirmado = false;
         this.numeroInvitados = 0;
+        this.estado = EstadoCoordinador.PENDIENTE;
     }
     
     // Constructor con parámetros
@@ -55,6 +60,7 @@ public class Coordinador {
         this.celular = celular;
         this.confirmado = false;
         this.numeroInvitados = 0;
+        this.estado = EstadoCoordinador.PENDIENTE;
     }
     
     // Getters y Setters
@@ -128,6 +134,14 @@ public class Coordinador {
     
     public void setInvitados(List<Invitado> invitados) {
         this.invitados = invitados;
+    }
+    
+    public EstadoCoordinador getEstado() {
+        return estado;
+    }
+    
+    public void setEstado(EstadoCoordinador estado) {
+        this.estado = estado;
     }
     
     // Método helper para agregar invitados
