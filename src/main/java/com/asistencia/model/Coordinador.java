@@ -45,10 +45,10 @@ public class Coordinador {
     @Column(length = 500)
     private String observaciones;
     
-    @Column(precision = 10, scale = 7)
+    @Column(columnDefinition = "NUMERIC(10, 7)")
     private Double latitud;
     
-    @Column(precision = 10, scale = 7)
+    @Column(columnDefinition = "NUMERIC(10, 7)")
     private Double longitud;
     
     @OneToMany(mappedBy = "coordinador", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
