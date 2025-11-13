@@ -45,6 +45,12 @@ public class Coordinador {
     @Column(length = 500)
     private String observaciones;
     
+    @Column(precision = 10, scale = 7)
+    private Double latitud;
+    
+    @Column(precision = 10, scale = 7)
+    private Double longitud;
+    
     @OneToMany(mappedBy = "coordinador", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Llamada> llamadas = new ArrayList<>();
@@ -145,6 +151,22 @@ public class Coordinador {
     
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
+    }
+    
+    public Double getLatitud() {
+        return latitud;
+    }
+    
+    public void setLatitud(Double latitud) {
+        this.latitud = latitud;
+    }
+    
+    public Double getLongitud() {
+        return longitud;
+    }
+    
+    public void setLongitud(Double longitud) {
+        this.longitud = longitud;
     }
     
     public List<Llamada> getLlamadas() {

@@ -63,6 +63,8 @@ public class CoordinadorController {
                     coordinadorExistente.setNombreCompleto(coordinador.getNombreCompleto());
                     coordinadorExistente.setCelular(coordinador.getCelular());
                     coordinadorExistente.setEmail(coordinador.getEmail());
+                    coordinadorExistente.setLatitud(coordinador.getLatitud());
+                    coordinadorExistente.setLongitud(coordinador.getLongitud());
                     // Preservar campos no editables: fechaLlamada, observaciones, confirmado, numeroInvitados, llamadas
                     return ResponseEntity.ok(coordinadorService.guardar(coordinadorExistente));
                 })
