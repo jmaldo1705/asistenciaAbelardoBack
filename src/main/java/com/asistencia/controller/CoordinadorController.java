@@ -13,7 +13,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/coordinadores")
-@CrossOrigin(origins = "http://localhost:4200")
 public class CoordinadorController {
     
     @Autowired
@@ -21,7 +20,14 @@ public class CoordinadorController {
     
     @GetMapping
     public ResponseEntity<List<Coordinador>> obtenerTodos() {
-        return ResponseEntity.ok(coordinadorService.obtenerTodos());
+        try {
+            List<Coordinador> coordinadores = coordinadorService.obtenerTodos();
+            return ResponseEntity.ok(coordinadores);
+        } catch (Exception e) {
+            System.err.println("❌ Error al obtener coordinadores: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
     
     @GetMapping("/{id}")
