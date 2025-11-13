@@ -1,5 +1,6 @@
 package com.asistencia.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,8 +16,10 @@ public class Coordinador {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @NotBlank(message = "El municipio es obligatorio")
-    @Column(nullable = false)
+    @Column
+    private String ciudad;
+    
+    @Column
     private String municipio;
     
     @NotBlank(message = "El nombre completo es obligatorio")
@@ -26,6 +29,9 @@ public class Coordinador {
     @NotBlank(message = "El celular es obligatorio")
     @Column(nullable = false)
     private String celular;
+    
+    @Column
+    private String email;
     
     private LocalDateTime fechaLlamada;
     
@@ -39,28 +45,25 @@ public class Coordinador {
     @Column(length = 500)
     private String observaciones;
     
-    @Enumerated(EnumType.STRING)
-    @Column(length = 20)
-    private EstadoCoordinador estado;
-    
     @OneToMany(mappedBy = "coordinador", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Invitado> invitados = new ArrayList<>();
+    @JsonManagedReference
+    private List<Llamada> llamadas = new ArrayList<>();
     
     // Constructor vacío
     public Coordinador() {
         this.confirmado = false;
         this.numeroInvitados = 0;
-        this.estado = EstadoCoordinador.PENDIENTE;
     }
     
     // Constructor con parámetros
-    public Coordinador(String municipio, String nombreCompleto, String celular) {
+    public Coordinador(String ciudad, String municipio, String nombreCompleto, String celular, String email) {
+        this.ciudad = ciudad;
         this.municipio = municipio;
         this.nombreCompleto = nombreCompleto;
         this.celular = celular;
+        this.email = email;
         this.confirmado = false;
         this.numeroInvitados = 0;
-        this.estado = EstadoCoordinador.PENDIENTE;
     }
     
     // Getters y Setters
@@ -70,6 +73,14 @@ public class Coordinador {
     
     public void setId(Long id) {
         this.id = id;
+    }
+    
+    public String getCiudad() {
+        return ciudad;
+    }
+    
+    public void setCiudad(String ciudad) {
+        this.ciudad = ciudad;
     }
     
     public String getMunicipio() {
@@ -94,6 +105,14 @@ public class Coordinador {
     
     public void setCelular(String celular) {
         this.celular = celular;
+    }
+    
+    public String getEmail() {
+        return email;
+    }
+    
+    public void setEmail(String email) {
+        this.email = email;
     }
     
     public LocalDateTime getFechaLlamada() {
@@ -128,31 +147,28 @@ public class Coordinador {
         this.observaciones = observaciones;
     }
     
-    public List<Invitado> getInvitados() {
-        return invitados;
+    public List<Llamada> getLlamadas() {
+        return llamadas;
     }
     
-    public void setInvitados(List<Invitado> invitados) {
-        this.invitados = invitados;
+    public void setLlamadas(List<Llamada> llamadas) {
+        this.llamadas = llamadas;
     }
     
-    public EstadoCoordinador getEstado() {
-        return estado;
+    // Método helper para agregar llamadas
+    public void addLlamada(Llamada llamada) {
+        llamadas.add(llamada);
+        llamada.setCoordinador(this);
     }
     
-    public void setEstado(EstadoCoordinador estado) {
-        this.estado = estado;
+    // Método helper para remover llamadas
+    public void removeLlamada(Llamada llamada) {
+        llamadas.remove(llamada);
+        llamada.setCoordinador(null);
     }
     
-    // Método helper para agregar invitados
-    public void addInvitado(Invitado invitado) {
-        invitados.add(invitado);
-        invitado.setCoordinador(this);
-    }
-    
-    // Método helper para remover invitados
-    public void removeInvitado(Invitado invitado) {
-        invitados.remove(invitado);
-        invitado.setCoordinador(null);
+    // Método para obtener el número de llamadas
+    public int getNumeroLlamadas() {
+        return llamadas != null ? llamadas.size() : 0;
     }
 }
