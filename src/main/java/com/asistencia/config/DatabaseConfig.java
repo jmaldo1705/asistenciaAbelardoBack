@@ -62,14 +62,14 @@ public class DatabaseConfig {
         
         // Configuración por defecto para desarrollo local
         System.out.println("🔗 Conectando a PostgreSQL local:");
-        System.out.println("   URL: jdbc:postgresql://localhost:5432/asistenciadb");
+        System.out.println("   URL: jdbc:postgresql://localhost:5432/asistencia");
         System.out.println("   Usuario: admin");
         
         return DataSourceBuilder
                 .create()
-                .url("jdbc:postgresql://localhost:5432/asistenciadb")
+                .url("jdbc:postgresql://localhost:5432/asistencia")
                 .username("admin")
-                .password("admin.123")
+                .password("password123")
                 .driverClassName("org.postgresql.Driver")
                 .build();
     }

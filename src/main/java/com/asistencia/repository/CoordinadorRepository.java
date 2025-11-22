@@ -2,6 +2,8 @@ package com.asistencia.repository;
 
 import com.asistencia.model.Coordinador;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,4 +16,7 @@ public interface CoordinadorRepository extends JpaRepository<Coordinador, Long> 
     
     // Métodos para contar por estado de confirmación
     Long countByConfirmado(Boolean confirmado);
+    
+    @Query("SELECT DISTINCT c FROM Coordinador c JOIN c.llamadas l WHERE l.evento.id = :eventoId")
+    List<Coordinador> findByLlamadasEventoId(@Param("eventoId") Long eventoId);
 }

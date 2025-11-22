@@ -13,30 +13,34 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/llamadas")
 public class LlamadaController {
-    
+
     @Autowired
     private LlamadaService llamadaService;
-    
+
     @PostMapping("/coordinador/{coordinadorId}")
     public ResponseEntity<Llamada> registrarLlamada(
             @PathVariable Long coordinadorId,
-            @RequestBody Map<String, String> datos) {
-        
-        String observaciones = datos.get("observaciones");
-        Llamada llamada = llamadaService.registrarLlamada(coordinadorId, observaciones);
+            @RequestBody Map<String, Object> datos) {
+
+        String observaciones = (String) datos.get("observaciones");
+        Long eventoId = null;
+        if (datos.containsKey("eventoId") && datos.get("eventoId") != null) {
+            eventoId = Long.valueOf(datos.get("eventoId").toString());
+        }
+
+        Llamada llamada = llamadaService.registrarLlamada(coordinadorId, observaciones, eventoId);
         return ResponseEntity.status(HttpStatus.CREATED).body(llamada);
     }
-    
+
     @GetMapping("/coordinador/{coordinadorId}")
     public ResponseEntity<List<Llamada>> obtenerLlamadasPorCoordinador(@PathVariable Long coordinadorId) {
         List<Llamada> llamadas = llamadaService.obtenerLlamadasPorCoordinador(coordinadorId);
         return ResponseEntity.ok(llamadas);
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarLlamada(@PathVariable Long id) {
         llamadaService.eliminarLlamada(id);
         return ResponseEntity.noContent().build();
     }
 }
-
