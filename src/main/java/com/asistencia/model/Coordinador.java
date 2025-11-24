@@ -24,6 +24,10 @@ public class Coordinador {
     @Column
     private String sector;
 
+    // Columna legacy - ignorada en inserts/updates pero necesaria para evitar errores de NOT NULL
+    @Column(name = "ciudad", insertable = false, updatable = false)
+    private String ciudad;
+
     @NotBlank(message = "El nombre completo es obligatorio")
     @Column(nullable = false)
     private String nombreCompleto;
