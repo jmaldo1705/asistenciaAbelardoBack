@@ -42,34 +42,77 @@ public class CoordinadorController {
         return ResponseEntity.ok(coordinadorService.buscarPorMunicipio(municipio));
     }
 
+    @GetMapping("/buscar-cedula")
+    public ResponseEntity<List<Coordinador>> buscarPorCedula(@RequestParam String cedula) {
+        return ResponseEntity.ok(coordinadorService.buscarPorCedula(cedula));
+    }
+
     @GetMapping("/confirmados")
     public ResponseEntity<List<Coordinador>> obtenerConfirmados(@RequestParam Boolean confirmado) {
         return ResponseEntity.ok(coordinadorService.buscarPorEstadoConfirmacion(confirmado));
     }
 
     @PostMapping
-    public ResponseEntity<Coordinador> crear(@Valid @RequestBody Coordinador coordinador) {
-        Coordinador nuevoCoordinador = coordinadorService.guardar(coordinador);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoCoordinador);
+    public ResponseEntity<?> crear(@Valid @RequestBody Coordinador coordinador) {
+        try {
+            // Asegurar que los campos obligatorios tengan valores por defecto si vienen como null
+            if (coordinador.getConfirmado() == null) {
+                coordinador.setConfirmado(false);
+            }
+            if (coordinador.getNumeroInvitados() == null) {
+                coordinador.setNumeroInvitados(0);
+            }
+            
+            // Validar cédula única si se proporciona
+            if (coordinador.getCedula() != null && !coordinador.getCedula().trim().isEmpty()) {
+                if (coordinadorService.existePorCedula(coordinador.getCedula())) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT)
+                            .body(Map.of("error", "Esta cédula ya existe", "cedula", coordinador.getCedula()));
+                }
+            }
+            Coordinador nuevoCoordinador = coordinadorService.guardar(coordinador);
+            return ResponseEntity.status(HttpStatus.CREATED).body(nuevoCoordinador);
+        } catch (Exception e) {
+            System.err.println("❌ Error al crear coordinador: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error al crear coordinador: " + e.getMessage()));
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Coordinador> actualizar(@PathVariable Long id, @Valid @RequestBody Coordinador coordinador) {
-        return coordinadorService.obtenerPorId(id)
-                .map(coordinadorExistente -> {
-                    // Solo actualizar campos editables
-                    coordinadorExistente.setMunicipio(coordinador.getMunicipio());
-                    coordinadorExistente.setSector(coordinador.getSector());
-                    coordinadorExistente.setNombreCompleto(coordinador.getNombreCompleto());
-                    coordinadorExistente.setCelular(coordinador.getCelular());
-                    coordinadorExistente.setEmail(coordinador.getEmail());
-                    coordinadorExistente.setLatitud(coordinador.getLatitud());
-                    coordinadorExistente.setLongitud(coordinador.getLongitud());
-                    // Preservar campos no editables: fechaLlamada, observaciones, confirmado,
-                    // numeroInvitados, llamadas
-                    return ResponseEntity.ok(coordinadorService.guardar(coordinadorExistente));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody Coordinador coordinador) {
+        try {
+            return coordinadorService.obtenerPorId(id)
+                    .map(coordinadorExistente -> {
+                        // Validar cédula única si se proporciona y es diferente a la actual
+                        if (coordinador.getCedula() != null && !coordinador.getCedula().trim().isEmpty()) {
+                            if (!coordinador.getCedula().equals(coordinadorExistente.getCedula()) &&
+                                    coordinadorService.existePorCedula(coordinador.getCedula())) {
+                                return ResponseEntity.status(HttpStatus.CONFLICT)
+                                        .body(Map.of("error", "Esta cédula ya existe", "cedula", coordinador.getCedula()));
+                            }
+                        }
+                        // Solo actualizar campos editables
+                        coordinadorExistente.setMunicipio(coordinador.getMunicipio());
+                        coordinadorExistente.setSector(coordinador.getSector());
+                        coordinadorExistente.setNombreCompleto(coordinador.getNombreCompleto());
+                        coordinadorExistente.setCelular(coordinador.getCelular());
+                        coordinadorExistente.setEmail(coordinador.getEmail());
+                        coordinadorExistente.setCedula(coordinador.getCedula());
+                        coordinadorExistente.setLatitud(coordinador.getLatitud());
+                        coordinadorExistente.setLongitud(coordinador.getLongitud());
+                        // Preservar campos no editables: fechaLlamada, observaciones, confirmado,
+                        // numeroInvitados, llamadas
+                        return ResponseEntity.ok(coordinadorService.guardar(coordinadorExistente));
+                    })
+                    .orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            System.err.println("❌ Error al actualizar coordinador: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error al actualizar coordinador: " + e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{id}")

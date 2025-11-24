@@ -35,6 +35,9 @@ public class Coordinador {
     @Column
     private String email;
 
+    @Column(unique = true)
+    private String cedula;
+
     private LocalDateTime fechaLlamada;
 
     @Column(nullable = false)
@@ -125,6 +128,14 @@ public class Coordinador {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getCedula() {
+        return cedula;
+    }
+
+    public void setCedula(String cedula) {
+        this.cedula = cedula;
     }
 
     public LocalDateTime getFechaLlamada() {

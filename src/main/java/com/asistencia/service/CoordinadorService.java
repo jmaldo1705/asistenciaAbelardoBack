@@ -101,4 +101,20 @@ public class CoordinadorService {
         });
         return coordinadores;
     }
+
+    public boolean existePorCedula(String cedula) {
+        if (cedula == null || cedula.trim().isEmpty()) {
+            return false;
+        }
+        return coordinadorRepository.existsByCedula(cedula);
+    }
+
+    public List<Coordinador> buscarPorCedula(String cedula) {
+        if (cedula == null || cedula.trim().isEmpty()) {
+            return List.of();
+        }
+        return coordinadorRepository.findByCedula(cedula)
+                .map(List::of)
+                .orElse(List.of());
+    }
 }
