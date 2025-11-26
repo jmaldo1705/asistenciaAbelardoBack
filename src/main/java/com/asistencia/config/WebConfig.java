@@ -18,7 +18,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .setCacheControl(CacheControl.maxAge(1, TimeUnit.DAYS).cachePublic());
         
         // Cache para imágenes por 7 días
-        registry.addResourceHandler("/images/**", "/**/*.png", "/**/*.jpg", "/**/*.jpeg", "/**/*.gif", "/**/*.svg")
+        registry.addResourceHandler("/images/**")
                 .addResourceLocations("classpath:/static/images/")
                 .setCacheControl(CacheControl.maxAge(7, TimeUnit.DAYS).cachePublic());
     }
