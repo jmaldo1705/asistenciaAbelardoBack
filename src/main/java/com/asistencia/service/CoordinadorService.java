@@ -1,8 +1,12 @@
 package com.asistencia.service;
 
 import com.asistencia.model.Coordinador;
+import com.asistencia.model.RegistroAuditoria;
 import com.asistencia.repository.CoordinadorRepository;
+import com.asistencia.repository.RegistroAuditoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +19,9 @@ public class CoordinadorService {
 
     @Autowired
     private CoordinadorRepository coordinadorRepository;
+    
+    @Autowired
+    private RegistroAuditoriaRepository registroAuditoriaRepository;
 
     public List<Coordinador> obtenerTodos() {
         List<Coordinador> coordinadores = coordinadorRepository.findAll();
@@ -60,6 +67,36 @@ public class CoordinadorService {
     }
 
     public void eliminar(Long id) {
+        // Obtener información del coordinador antes de eliminarlo
+        Optional<Coordinador> coordinadorOpt = coordinadorRepository.findById(id);
+        
+        if (coordinadorOpt.isPresent()) {
+            Coordinador coordinador = coordinadorOpt.get();
+            
+            // Obtener usuario actual
+            String usuario = "Sistema";
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+                usuario = auth.getName();
+            }
+            
+            // Registrar la eliminación en auditoría
+            String detalle = "Coordinador eliminado: " + coordinador.getNombreCompleto() + 
+                           " - " + coordinador.getMunicipio() + 
+                           " (Cédula: " + coordinador.getCedula() + ")";
+            
+            RegistroAuditoria registro = new RegistroAuditoria(
+                "Coordinador",
+                id,
+                "ELIMINACIÓN",
+                usuario,
+                detalle
+            );
+            
+            registroAuditoriaRepository.save(registro);
+        }
+        
+        // Eliminar el coordinador
         coordinadorRepository.deleteById(id);
     }
 

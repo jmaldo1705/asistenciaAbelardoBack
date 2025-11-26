@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "eventos")
-public class Evento {
+public class Evento extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

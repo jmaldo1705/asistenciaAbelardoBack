@@ -4,6 +4,7 @@ import com.asistencia.service.WhatsAppService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -21,6 +22,7 @@ public class WhatsAppController {
      * Endpoint para enviar un mensaje individual de WhatsApp
      */
     @PostMapping("/enviar")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EDITOR')")
     public ResponseEntity<Map<String, Object>> enviarMensaje(@RequestBody Map<String, String> request) {
         Map<String, Object> response = new HashMap<>();
         
@@ -62,6 +64,7 @@ public class WhatsAppController {
      * Endpoint para enviar mensajes masivos de WhatsApp
      */
     @PostMapping("/enviar-masivo")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EDITOR')")
     public ResponseEntity<Map<String, Object>> enviarMensajesMasivos(@RequestBody Map<String, Object> request) {
         Map<String, Object> response = new HashMap<>();
         

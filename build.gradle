@@ -23,8 +23,26 @@ dependencies {
     implementation 'org.postgresql:postgresql'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'com.twilio.sdk:twilio:9.14.1'
+    
+    // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    
+    // JWT - forzando versión 0.12.3 para evitar conflictos
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+    
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'io.jsonwebtoken:jjwt-api:0.12.3'
+        force 'io.jsonwebtoken:jjwt-impl:0.12.3'
+        force 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+    }
 }
 
 tasks.named('test') {

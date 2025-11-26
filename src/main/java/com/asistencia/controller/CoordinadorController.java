@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -53,6 +54,7 @@ public class CoordinadorController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EDITOR')")
     public ResponseEntity<?> crear(@Valid @RequestBody Coordinador coordinador) {
         try {
             // Asegurar que los campos obligatorios tengan valores por defecto si vienen como null
@@ -81,6 +83,7 @@ public class CoordinadorController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EDITOR')")
     public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody Coordinador coordinador) {
         try {
             return coordinadorService.obtenerPorId(id)
@@ -116,6 +119,7 @@ public class CoordinadorController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EDITOR')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         coordinadorService.eliminar(id);
         return ResponseEntity.noContent().build();
@@ -129,12 +133,14 @@ public class CoordinadorController {
     }
 
     @PostMapping("/{coordinadorId}/eventos/{eventoId}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EDITOR')")
     public ResponseEntity<Void> asignarEvento(@PathVariable Long coordinadorId, @PathVariable Long eventoId) {
         coordinadorService.asignarEvento(coordinadorId, eventoId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{coordinadorId}/eventos/{eventoId}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EDITOR')")
     public ResponseEntity<Void> desasignarEvento(@PathVariable Long coordinadorId, @PathVariable Long eventoId) {
         coordinadorService.desasignarEvento(coordinadorId, eventoId);
         return ResponseEntity.noContent().build();

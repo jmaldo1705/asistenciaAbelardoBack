@@ -1,27 +1,12 @@
 package com.asistencia.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * CORS ahora está configurado en SecurityConfig.java
+ * Este archivo se mantiene por compatibilidad pero no contiene configuración activa
+ */
 @Configuration
 public class CorsConfig {
-
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**")
-                        .allowedOriginPatterns(
-                                "http://localhost:4200",
-                                "https://asistencia-abelardo.vercel.app",
-                                "https://*.vercel.app")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
-            }
-        };
-    }
+    // CORS configuration moved to SecurityConfig.java
 }

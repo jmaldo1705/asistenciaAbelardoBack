@@ -12,7 +12,7 @@ import java.util.HashSet;
 
 @Entity
 @Table(name = "coordinadores")
-public class Coordinador {
+public class Coordinador extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

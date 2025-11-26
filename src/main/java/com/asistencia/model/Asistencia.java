@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "asistencias")
-public class Asistencia {
+public class Asistencia extends Auditable {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

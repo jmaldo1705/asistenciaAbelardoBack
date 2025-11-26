@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public class AsistenciaController {
     
     // Crear nueva asistencia
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EDITOR')")
     public ResponseEntity<Asistencia> crear(@Valid @RequestBody Asistencia asistencia) {
         Asistencia nuevaAsistencia = asistenciaService.crear(asistencia);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevaAsistencia);
@@ -41,6 +43,7 @@ public class AsistenciaController {
     
     // Actualizar asistencia
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EDITOR')")
     public ResponseEntity<Asistencia> actualizar(
             @PathVariable Long id,
             @Valid @RequestBody Asistencia asistencia) {
@@ -54,6 +57,7 @@ public class AsistenciaController {
     
     // Eliminar asistencia
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EDITOR')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         asistenciaService.eliminar(id);
         return ResponseEntity.noContent().build();

@@ -5,6 +5,7 @@ import com.asistencia.service.LlamadaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class LlamadaController {
     private LlamadaService llamadaService;
 
     @PostMapping("/coordinador/{coordinadorId}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EDITOR')")
     public ResponseEntity<Llamada> registrarLlamada(
             @PathVariable Long coordinadorId,
             @RequestBody Map<String, Object> datos) {
@@ -39,6 +41,7 @@ public class LlamadaController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EDITOR')")
     public ResponseEntity<Void> eliminarLlamada(@PathVariable Long id) {
         llamadaService.eliminarLlamada(id);
         return ResponseEntity.noContent().build();
