@@ -23,6 +23,127 @@ public class CoordinadorService {
     @Autowired
     private RegistroAuditoriaRepository registroAuditoriaRepository;
 
+    /**
+     * Compara dos coordinadores y genera un detalle de los cambios realizados
+     */
+    private String generarDetalleCambios(Coordinador anterior, Coordinador nuevo) {
+        StringBuilder cambios = new StringBuilder("Coordinador: " + anterior.getNombreCompleto() + " - Cambios: ");
+        boolean hayCambios = false;
+
+        if (!esIgual(anterior.getNombreCompleto(), nuevo.getNombreCompleto())) {
+            cambios.append("Nombre: '").append(anterior.getNombreCompleto())
+                   .append("' → '").append(nuevo.getNombreCompleto()).append("'; ");
+            hayCambios = true;
+        }
+
+        if (!esIgual(anterior.getMunicipio(), nuevo.getMunicipio())) {
+            cambios.append("Municipio: '").append(anterior.getMunicipio())
+                   .append("' → '").append(nuevo.getMunicipio()).append("'; ");
+            hayCambios = true;
+        }
+
+        if (!esIgual(anterior.getSector(), nuevo.getSector())) {
+            cambios.append("Sector: '").append(anterior.getSector())
+                   .append("' → '").append(nuevo.getSector()).append("'; ");
+            hayCambios = true;
+        }
+
+        if (!esIgual(anterior.getCelular(), nuevo.getCelular())) {
+            cambios.append("Celular: '").append(anterior.getCelular())
+                   .append("' → '").append(nuevo.getCelular()).append("'; ");
+            hayCambios = true;
+        }
+
+        if (!esIgual(anterior.getEmail(), nuevo.getEmail())) {
+            cambios.append("Email: '").append(anterior.getEmail())
+                   .append("' → '").append(nuevo.getEmail()).append("'; ");
+            hayCambios = true;
+        }
+
+        if (!esIgual(anterior.getCedula(), nuevo.getCedula())) {
+            cambios.append("Cédula: '").append(anterior.getCedula())
+                   .append("' → '").append(nuevo.getCedula()).append("'; ");
+            hayCambios = true;
+        }
+
+        if (!esIgualDouble(anterior.getLatitud(), nuevo.getLatitud())) {
+            cambios.append("Latitud: ").append(anterior.getLatitud())
+                   .append(" → ").append(nuevo.getLatitud()).append("; ");
+            hayCambios = true;
+        }
+
+        if (!esIgualDouble(anterior.getLongitud(), nuevo.getLongitud())) {
+            cambios.append("Longitud: ").append(anterior.getLongitud())
+                   .append(" → ").append(nuevo.getLongitud()).append("; ");
+            hayCambios = true;
+        }
+
+        if (!hayCambios) {
+            return "Coordinador: " + anterior.getNombreCompleto() + " - Sin cambios registrados";
+        }
+
+        // Eliminar el último "; "
+        String resultado = cambios.toString();
+        if (resultado.endsWith("; ")) {
+            resultado = resultado.substring(0, resultado.length() - 2);
+        }
+
+        return resultado;
+    }
+
+    private boolean esIgual(String a, String b) {
+        if (a == null && b == null) return true;
+        if (a == null || b == null) return false;
+        return a.equals(b);
+    }
+
+    private boolean esIgualDouble(Double a, Double b) {
+        if (a == null && b == null) return true;
+        if (a == null || b == null) return false;
+        return Math.abs(a - b) < 0.000001;
+    }
+
+    public Coordinador actualizarConAuditoria(Long id, Coordinador coordinadorNuevo) {
+        Coordinador anterior = coordinadorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Coordinador no encontrado"));
+
+        // Generar detalle de cambios
+        String detalleCambios = generarDetalleCambios(anterior, coordinadorNuevo);
+
+        // Actualizar los campos
+        anterior.setMunicipio(coordinadorNuevo.getMunicipio());
+        anterior.setSector(coordinadorNuevo.getSector());
+        anterior.setNombreCompleto(coordinadorNuevo.getNombreCompleto());
+        anterior.setCelular(coordinadorNuevo.getCelular());
+        anterior.setEmail(coordinadorNuevo.getEmail());
+        anterior.setCedula(coordinadorNuevo.getCedula());
+        anterior.setLatitud(coordinadorNuevo.getLatitud());
+        anterior.setLongitud(coordinadorNuevo.getLongitud());
+
+        Coordinador actualizado = coordinadorRepository.save(anterior);
+
+        // Registrar en auditoría solo si hubo cambios reales
+        if (!detalleCambios.contains("Sin cambios registrados")) {
+            String usuario = "Sistema";
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+                usuario = auth.getName();
+            }
+
+            RegistroAuditoria registro = new RegistroAuditoria(
+                "Coordinador",
+                id,
+                "MODIFICACIÓN",
+                usuario,
+                detalleCambios
+            );
+
+            registroAuditoriaRepository.save(registro);
+        }
+
+        return actualizado;
+    }
+
     public List<Coordinador> obtenerTodos() {
         List<Coordinador> coordinadores = coordinadorRepository.findAll();
         // Forzar la carga de las llamadas y eventos para evitar problemas de lazy

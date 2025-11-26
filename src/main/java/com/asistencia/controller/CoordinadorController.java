@@ -96,18 +96,9 @@ public class CoordinadorController {
                                         .body(Map.of("error", "Esta cédula ya existe", "cedula", coordinador.getCedula()));
                             }
                         }
-                        // Solo actualizar campos editables
-                        coordinadorExistente.setMunicipio(coordinador.getMunicipio());
-                        coordinadorExistente.setSector(coordinador.getSector());
-                        coordinadorExistente.setNombreCompleto(coordinador.getNombreCompleto());
-                        coordinadorExistente.setCelular(coordinador.getCelular());
-                        coordinadorExistente.setEmail(coordinador.getEmail());
-                        coordinadorExistente.setCedula(coordinador.getCedula());
-                        coordinadorExistente.setLatitud(coordinador.getLatitud());
-                        coordinadorExistente.setLongitud(coordinador.getLongitud());
-                        // Preservar campos no editables: fechaLlamada, observaciones, confirmado,
-                        // numeroInvitados, llamadas
-                        return ResponseEntity.ok(coordinadorService.guardar(coordinadorExistente));
+                        // Usar el nuevo método que registra cambios en auditoría
+                        Coordinador actualizado = coordinadorService.actualizarConAuditoria(id, coordinador);
+                        return ResponseEntity.ok(actualizado);
                     })
                     .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
