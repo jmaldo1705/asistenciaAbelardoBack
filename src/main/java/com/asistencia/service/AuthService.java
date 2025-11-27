@@ -40,12 +40,6 @@ public class AuthService {
         Usuario usuario = usuarioRepository.findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         
-        System.out.println("🔐 DEBUG LOGIN:");
-        System.out.println("   Username: " + loginRequest.getUsername());
-        System.out.println("   Password recibido: " + loginRequest.getPassword());
-        System.out.println("   Hash en BD: " + usuario.getPassword());
-        System.out.println("   Password matches: " + passwordEncoder.matches(loginRequest.getPassword(), usuario.getPassword()));
-        
         if (usuario.getCuentaBloqueada()) {
             throw new RuntimeException("Cuenta bloqueada. Contacte al administrador");
         }

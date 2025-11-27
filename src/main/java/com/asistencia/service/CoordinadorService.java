@@ -145,42 +145,59 @@ public class CoordinadorService {
     }
 
     public List<Coordinador> obtenerTodos() {
-        List<Coordinador> coordinadores = coordinadorRepository.findAll();
-        // Forzar la carga de las llamadas y eventos para evitar problemas de lazy
-        // loading
-        coordinadores.forEach(c -> {
-            c.getLlamadas().size();
-            c.getEventos().size();
-        });
-        return coordinadores;
+        try {
+            List<Coordinador> coordinadores = coordinadorRepository.findAll();
+            return coordinadores;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error al obtener coordinadores: " + e.getMessage(), e);
+        }
     }
 
     public Optional<Coordinador> obtenerPorId(Long id) {
-        Optional<Coordinador> coordinador = coordinadorRepository.findById(id);
-        // Forzar la carga de las llamadas y eventos
-        coordinador.ifPresent(c -> {
-            c.getLlamadas().size();
-            c.getEventos().size();
-        });
-        return coordinador;
+        try {
+            Optional<Coordinador> coordinador = coordinadorRepository.findById(id);
+            // Inicializar colecciones lazy si es necesario
+            coordinador.ifPresent(c -> {
+                try {
+                    if (c.getLlamadas() != null) {
+                        c.getLlamadas().size();
+                    }
+                    if (c.getEventos() != null) {
+                        c.getEventos().size();
+                    }
+                } catch (Exception e) {
+                    System.err.println("⚠️ Error al cargar relaciones para coordinador " + id + ": " + e.getMessage());
+                }
+            });
+            return coordinador;
+        } catch (Exception e) {
+            System.err.println("❌ Error en obtenerPorId: " + e.getMessage());
+            e.printStackTrace();
+            return Optional.empty();
+        }
     }
 
     public List<Coordinador> buscarPorMunicipio(String municipio) {
-        List<Coordinador> coordinadores = coordinadorRepository.findByMunicipioContainingIgnoreCase(municipio);
-        coordinadores.forEach(c -> {
-            c.getLlamadas().size();
-            c.getEventos().size();
-        });
-        return coordinadores;
+        try {
+            List<Coordinador> coordinadores = coordinadorRepository.findByMunicipioContainingIgnoreCase(municipio);
+            return coordinadores;
+        } catch (Exception e) {
+            System.err.println("❌ Error en buscarPorMunicipio: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error al buscar coordinadores por municipio", e);
+        }
     }
 
     public List<Coordinador> buscarPorEstadoConfirmacion(Boolean confirmado) {
-        List<Coordinador> coordinadores = coordinadorRepository.findByConfirmado(confirmado);
-        coordinadores.forEach(c -> {
-            c.getLlamadas().size();
-            c.getEventos().size();
-        });
-        return coordinadores;
+        try {
+            List<Coordinador> coordinadores = coordinadorRepository.findByConfirmado(confirmado);
+            return coordinadores;
+        } catch (Exception e) {
+            System.err.println("❌ Error en buscarPorEstadoConfirmacion: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error al buscar coordinadores por estado", e);
+        }
     }
 
     public Coordinador guardar(Coordinador coordinador) {
@@ -251,13 +268,14 @@ public class CoordinadorService {
     }
 
     public List<Coordinador> obtenerPorEventoEnLlamadas(Long eventoId) {
-        List<Coordinador> coordinadores = coordinadorRepository.findByLlamadasEventoId(eventoId);
-        // Forzar la carga de las llamadas y eventos
-        coordinadores.forEach(c -> {
-            c.getLlamadas().size();
-            c.getEventos().size();
-        });
-        return coordinadores;
+        try {
+            List<Coordinador> coordinadores = coordinadorRepository.findByLlamadasEventoId(eventoId);
+            return coordinadores;
+        } catch (Exception e) {
+            System.err.println("❌ Error en obtenerPorEventoEnLlamadas: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error al obtener coordinadores por evento", e);
+        }
     }
 
     public boolean existePorCedula(String cedula) {

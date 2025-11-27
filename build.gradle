@@ -24,6 +24,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'com.twilio.sdk:twilio:9.14.1'
     
+    // Jackson Datatype para manejar proxies de Hibernate 6 (Jakarta EE)
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate6:2.18.2'
+    
     // Spring Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
     

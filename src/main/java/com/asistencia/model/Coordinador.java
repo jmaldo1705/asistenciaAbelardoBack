@@ -1,5 +1,7 @@
 package com.asistencia.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -61,11 +63,12 @@ public class Coordinador extends Auditable {
     private Double longitud;
 
     @OneToMany(mappedBy = "coordinador", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonIgnore
     private List<Llamada> llamadas = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "coordinador_evento", joinColumns = @JoinColumn(name = "coordinador_id"), inverseJoinColumns = @JoinColumn(name = "evento_id"))
+    @JsonIgnore
     private Set<Evento> eventos = new HashSet<>();
 
     // Constructor vacío
@@ -190,6 +193,7 @@ public class Coordinador extends Auditable {
         this.longitud = longitud;
     }
 
+    @JsonIgnore
     public List<Llamada> getLlamadas() {
         return llamadas;
     }
@@ -211,10 +215,12 @@ public class Coordinador extends Auditable {
     }
 
     // Método para obtener el número de llamadas
+    @JsonIgnore
     public int getNumeroLlamadas() {
         return llamadas != null ? llamadas.size() : 0;
     }
 
+    @JsonIgnore
     public Set<Evento> getEventos() {
         return eventos;
     }
