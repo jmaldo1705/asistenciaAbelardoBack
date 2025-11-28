@@ -201,7 +201,33 @@ public class CoordinadorService {
     }
 
     public Coordinador guardar(Coordinador coordinador) {
-        return coordinadorRepository.save(coordinador);
+        boolean esNuevo = coordinador.getId() == null;
+        Coordinador guardado = coordinadorRepository.save(coordinador);
+        
+        // Registrar creación en auditoría solo si es nuevo
+        if (esNuevo) {
+            String usuario = "Sistema";
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+                usuario = auth.getName();
+            }
+            
+            String detalle = "Coordinador: " + guardado.getNombreCompleto() + " - " + 
+                           guardado.getMunicipio() + 
+                           (guardado.getCedula() != null ? " (Cédula: " + guardado.getCedula() + ")" : "");
+            
+            RegistroAuditoria registro = new RegistroAuditoria(
+                "Coordinador",
+                guardado.getId(),
+                "CREACIÓN",
+                usuario,
+                detalle
+            );
+            
+            registroAuditoriaRepository.save(registro);
+        }
+        
+        return guardado;
     }
 
     public void eliminar(Long id) {

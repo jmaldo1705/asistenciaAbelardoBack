@@ -1,8 +1,12 @@
 package com.asistencia.service;
 
 import com.asistencia.model.Asistencia;
+import com.asistencia.model.RegistroAuditoria;
 import com.asistencia.repository.AsistenciaRepository;
+import com.asistencia.repository.RegistroAuditoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -14,6 +18,9 @@ public class AsistenciaService {
     
     @Autowired
     private AsistenciaRepository asistenciaRepository;
+    
+    @Autowired
+    private RegistroAuditoriaRepository registroAuditoriaRepository;
     
     // Obtener todas las asistencias
     public List<Asistencia> obtenerTodas() {
@@ -28,7 +35,28 @@ public class AsistenciaService {
     // Crear nueva asistencia
     public Asistencia crear(Asistencia asistencia) {
         asistencia.setFechaHora(LocalDateTime.now());
-        return asistenciaRepository.save(asistencia);
+        Asistencia guardada = asistenciaRepository.save(asistencia);
+        
+        // Registrar creación en auditoría
+        String usuario = "Sistema";
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            usuario = auth.getName();
+        }
+        
+        String detalle = "Asistencia registrada: " + guardada.getNombre() + " " + 
+                        guardada.getApellido() + " (" + guardada.getEmail() + ")";
+        
+        RegistroAuditoria registro = new RegistroAuditoria(
+            "Asistencia",
+            guardada.getId(),
+            "CREACIÓN",
+            usuario,
+            detalle
+        );
+        
+        registroAuditoriaRepository.save(registro);
+        return guardada;
     }
     
     // Actualizar asistencia

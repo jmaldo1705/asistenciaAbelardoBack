@@ -2,9 +2,13 @@ package com.asistencia.service;
 
 import com.asistencia.model.Coordinador;
 import com.asistencia.model.Llamada;
+import com.asistencia.model.RegistroAuditoria;
 import com.asistencia.repository.CoordinadorRepository;
 import com.asistencia.repository.LlamadaRepository;
+import com.asistencia.repository.RegistroAuditoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +26,9 @@ public class LlamadaService {
 
     @Autowired
     private com.asistencia.repository.EventoRepository eventoRepository;
+    
+    @Autowired
+    private RegistroAuditoriaRepository registroAuditoriaRepository;
 
     @Transactional
     public Llamada registrarLlamada(Long coordinadorId, String observaciones, Long eventoId) {
@@ -44,6 +51,26 @@ public class LlamadaService {
         // Actualizar la fecha de última llamada del coordinador
         coordinador.setFechaLlamada(guardada.getFecha());
         coordinadorRepository.save(coordinador);
+        
+        // Registrar creación en auditoría
+        String usuario = "Sistema";
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            usuario = auth.getName();
+        }
+        
+        String detalle = "Llamada registrada a: " + coordinador.getNombreCompleto() + 
+                        (eventoId != null ? " - Evento ID: " + eventoId : "");
+        
+        RegistroAuditoria registro = new RegistroAuditoria(
+            "Llamada",
+            guardada.getId(),
+            "CREACIÓN",
+            usuario,
+            detalle
+        );
+        
+        registroAuditoriaRepository.save(registro);
 
         return guardada;
     }
